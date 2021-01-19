@@ -12,10 +12,6 @@ import AppKit
 import UIKit
 #endif
 
-extension OSLog {
-	private static var subsystem = "SwiftyMarkdown"
-	static let swiftyMarkdownPerformance = OSLog(subsystem: subsystem, category: "Swifty Markdown Performance")
-}
 
 public enum CharacterStyle : CharacterStyling {
 	case none
@@ -267,8 +263,6 @@ If that is not set, then the system default will be used.
 	var previouslyFoundTokens : [Token] = []
 	
 	var applyAttachments = true
-	
-	let perfomanceLog = PerformanceLog(with: "SwiftyMarkdownPerformanceLogging", identifier: "Swifty Markdown", log: .swiftyMarkdownPerformance)
 		
 	/**
 	
@@ -392,7 +386,6 @@ If that is not set, then the system default will be used.
 	open func attributedString(from markdownString : String? = nil) -> NSAttributedString {
 		
 		self.previouslyFoundTokens.removeAll()
-		self.perfomanceLog.start()
 		
 		if let existentMarkdownString = markdownString {
 			self.string = existentMarkdownString
@@ -417,9 +410,7 @@ If that is not set, then the system default will be used.
 			}
 			keyValuePairs[key] = strings[1].trimmingCharacters(in: .whitespacesAndNewlines)
 		}
-		
-		self.perfomanceLog.tag(with: "(line processing complete)")
-		
+				
 		self.tokeniser.metadataLookup = keyValuePairs
 		
 		for (idx, line) in referencesRemoved.enumerated() {
@@ -428,14 +419,11 @@ If that is not set, then the system default will be used.
 			}
 			let finalTokens = self.tokeniser.process(line.line)
 			self.previouslyFoundTokens.append(contentsOf: finalTokens)
-			self.perfomanceLog.tag(with: "(tokenising complete for line \(idx)")
 			
 			attributedString.append(attributedStringFor(tokens: finalTokens, in: line))
 			
 		}
-		
-		self.perfomanceLog.end()
-		
+				
 		return attributedString
 	}
 	
